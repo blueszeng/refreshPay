@@ -9,12 +9,14 @@ const createCard = async (accountInfo) => {
     accountvalues.push(value)
   }
   let sql =
-   `INSERT INTO t_agent_add_cards_to_user(${accountkeys})
+   `INSERT INTO t_agent_add_cards_to_agent(${accountkeys})
     VALUES(${accountvalues})`
   try {
+    console.log(sql)
     cardInfo = await db.query(sql)
+    console.log('add t_agent_add_cards_to_agent success')
   } catch (err) {
-    console.log(`create t_agent_add_cards_to_user ${err}`)
+    console.log(`create t_agent_add_cards_to_agent ${err}`)
   }
   return cardInfo
 }
