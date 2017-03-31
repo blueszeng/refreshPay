@@ -9,9 +9,10 @@
     "whatwg-fetch": "^2.0.3",
     "xmljson": "^0.2.0",
     "xmljson-converter": "^1.2.2"
-  },
+  }, 
   "scripts": {
-    "start": "babel-node ./index.js"
+    "start": "babel-node ./src/index.js",
+    "build": "babel src -d build"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",

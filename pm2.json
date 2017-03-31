@@ -1,9 +1,0 @@
-{
-	"apps" : [{
-		"script": "./index.js",
-		"name": "refreshPay",
-		"next_gen_js": true,
-		"autorestart": false
-		}
-	]
-}
