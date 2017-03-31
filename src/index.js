@@ -2,6 +2,7 @@ import order from './model/order'
 import agent from './model/agent'
 import cards from './model/addCards'
 import rebates from './model/rebate'
+import record from './model/record'
 import crypto from './utils/crypto'
 import http from './utils/http'
 import tools from './utils/tools'
@@ -22,8 +23,15 @@ const run = async () => {
         let ret = await http.post(url, postData)
         if (ret.ok) {
           let items = await ret.text()
-          let state = await tools.xmlToJson(items)
-          state = parseInt(state)
+          console.log(items)
+          let parseState = await tools.xmlToJson(items)
+          let state = parseInt(parseState.state)
+          if (parseState.sd51no) {
+            _order.sd51no = parseState.sd51no
+          }
+          if (parseState.ordermoney) {
+            _order.ordermoney = parseState.ordermoney * 100
+          }
           if (state === 1) {
             await order.updateOrderStatus(state, _order.order_no) // 更新订单状态
             let account = await agent.getAgentAccountsInfoById(_order.oper_account)
@@ -42,12 +50,29 @@ const run = async () => {
                   accept_frone: _order.order_gems,
                   accept_queen: account.gems + _order.order_gems
                 }
-                console.log(date)
                 await cards.createCard(date)
+                let cord = await record.getRecordInfoByOrderNo(_order.order_no)
+                 // 更新钻石
+                let orderGems = account.gems + _order.order_gems
+                await agent.updateAgentGems(orderGems, _order.oper_account)
+                  if (!cord) {
+                  try {
+                    let data = {
+                    order_no: _order.order_no,
+                    state: 1,
+                    gateway_no: _order.sd51no,
+                    fill_money: _order.ordermoney,
+                    sign: _order.sign,
+                    order_gems: orderGems
+                  }
+                  await record.createRecord(data)
+                  }catch(err) {
+                    console.log( err)
+                  }
+                  
+                }
               }
-              // 更新钻石
-              let orderGems = account.gems + _order.order_gems
-              await agent.updateAgentGems(orderGems, _order.oper_account)
+             
             } else {
               let superior = await agent.getAgentAccountsInfoById(account.referrer)
               let upSuperior = await agent.getAgentAccountsInfoById(superior.referrer)
@@ -83,7 +108,6 @@ const run = async () => {
                     })()
                   }
                   await rebates.createRebate(data2)
-                  
                   // 存在多级代理
                 } else if (superior && superior.agencylv >= 2) {
                   let data3 = {
@@ -110,6 +134,18 @@ const run = async () => {
               // 更新钻石
               let orderGems = account.gems + _order.order_gems
               await agent.updateAgentGems(orderGems, _order.oper_account)
+              let cord = await record.getRecordInfoByOrderNo(_order.order_no)
+              if (!cord) {
+                let data = {
+                  order_no: _order.order_no,
+                  state: 1,
+                  gateway_no: _order.sd51no,
+                  fill_money: _order.ordermoney,
+                  sign: _order.sign,
+                  order_gems: orderGems
+                }
+                await record.createRecord(data)
+              }
             }
           }
         }
@@ -117,5 +153,5 @@ const run = async () => {
     }
   }
 }
-run()
-//setInterval(run, 60000)
+// run()
+setInterval(run, 60000)
