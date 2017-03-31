@@ -18,11 +18,13 @@ const getAllOrderInfo = async () => {
     let times = getTowDayUnixTime()
     let sql =
      `SELECT * FROM yp_apply_order
-       WHERE UNIX_TIMESTAMP(times) > ${times.beginTime} and UNIX_TIMESTAMP(times) < ${times.endTime}`
+       WHERE UNIX_TIMESTAMP(times) > ${times.beginTime} AND UNIX_TIMESTAMP(times) < ${times.endTime} 
+             AND order_status = 0`
     console.log(sql)
 
     try {
       orderData = await db.query(sql)
+      console.log('serach date len is=>', orderData.length)
     } catch (err) {
       console.log(`search yp_apply_order ${err}`)
     }

@@ -49,6 +49,7 @@ const cleanCache = async function (key) {
   }
   key = prefix + key
   await redisClient.del(key)
+  console.log('clean', key)
 }
 export default {
   setCache,
