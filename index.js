@@ -19,19 +19,15 @@ const run = async () => {
   let orderData = await order.getAllOrderInfo()
   if (orderData !== null && orderData.length > 0) {
     for (let _order of orderData) {
-      // _order.order_no = '329684171300031'
-      _order.order_status = 0
+      // _order.order_no = '331324439600042'
+      // _order.order_status = 0
       if (_order.order_status === 0) { // 只处理订单状态为0的。
         let postData = `customerid=${_order.customer_id}&sdcustomno=${_order.order_no}&sign=${createSign(_order)}&mark=${mark}`
-        // console.log(postData)
         let ret = await http.post(url, postData)
-        // ret.ok = 200
         if (ret.ok) {
           let items = await ret.text()
           let state = await tools.xmlToJson(items)
-          // console.log('state', state)
           state = parseInt(state)
-          // state = 1
           if (state === 1) {
             await order.updateOrderStatus(state, _order.order_no) // 更新订单状态
             let account = await agent.getAgentAccountsInfoById(_order.oper_account)
@@ -49,14 +45,12 @@ const run = async () => {
                   accept_frone: _order.order_gems,
                   accept_queen: account.gems + _order.order_gems
                 }
-                // console.log('order_gems', account.gems, _order.order_gems)
                 await cards.createCard(date)
               }
               // 更新钻石
               let orderGems = account.gems + _order.order_gems
               await agent.updateAgentGems(orderGems, _order.oper_account)
             } else {
-              // console.log('gogogogoogo===>')
               let superior = await agent.getAgentAccountsInfoById(account.referrer)
               let upSuperior = await agent.getAgentAccountsInfoById(superior.referrer)
 
@@ -111,7 +105,6 @@ const run = async () => {
                     up_id: upSuperior.accounts,
                     order_no: _order.order_no
                   }
-                  // console.log(data3)
                   await rebates.createRebate(data3)
                 }
               }
@@ -122,7 +115,7 @@ const run = async () => {
           }
         }
       }
-      break
+      // break
     }
   }
 }

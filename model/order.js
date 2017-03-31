@@ -18,8 +18,7 @@ const getAllOrderInfo = async () => {
     let times = getTowDayUnixTime()
     let sql =
      `SELECT * FROM yp_apply_order
-      WHERE order_no = '306874535350054'`
-      //  WHERE UNIX_TIMESTAMP(times) > ${times.beginTime} and UNIX_TIMESTAMP(times) < ${times.endTime}
+       WHERE UNIX_TIMESTAMP(times) > ${times.beginTime} and UNIX_TIMESTAMP(times) < ${times.endTime}`
     console.log(sql)
 
     try {
