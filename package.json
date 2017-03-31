@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "co-mysql": "^1.0.0",
+    "co-redis": "^2.1.1",
+    "isomorphic-fetch": "^2.2.1",
+    "moment": "^2.18.1",
+    "mysql": "^2.13.0",
+    "redis": "^2.7.1",
+    "whatwg-fetch": "^2.0.3",
+    "xmljson": "^0.2.0",
+    "xmljson-converter": "^1.2.2"
+  },
+  "scripts": {
+    "start": "babel-node ./index.js"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.24.0",
+    "babel-eslint": "^7.2.1",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-node5": "^12.0.1",
+    "babel-preset-stage-0": "^6.22.0",
+    "babel-register": "^6.24.0",
+    "eslint": "^3.18.0",
+    "eslint-config-standard": "^7.1.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^2.1.1"
+  }
+}
