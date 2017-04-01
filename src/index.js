@@ -23,7 +23,6 @@ const run = async () => {
         let ret = await http.post(url, postData)
         if (ret.ok) {
           let items = await ret.text()
-          console.log(items)
           let parseState = await tools.xmlToJson(items)
           let state = parseInt(parseState.state)
           if (parseState.sd51no) {
@@ -55,24 +54,17 @@ const run = async () => {
                  // 更新钻石
                 let orderGems = account.gems + _order.order_gems
                 await agent.updateAgentGems(orderGems, _order.oper_account)
-                  if (!cord) {
-                  try {
-                    let data = {
-                    order_no: _order.order_no,
-                    state: 1,
-                    gateway_no: _order.sd51no,
-                    fill_money: _order.ordermoney,
-                    sign: _order.sign,
-                    order_gems: orderGems
-                  }
-                  await record.createRecord(data)
-                  }catch(err) {
-                    console.log( err)
-                  }
-                  
+                if (!cord) {
+                  let data = {
+                  order_no: _order.order_no,
+                  state: 1,
+                  gateway_no: _order.sd51no,
+                  fill_money: _order.ordermoney,
+                  sign: _order.sign,
+                  order_gems: orderGems
                 }
+                await record.createRecord(data)
               }
-             
             } else {
               let superior = await agent.getAgentAccountsInfoById(account.referrer)
               let upSuperior = await agent.getAgentAccountsInfoById(superior.referrer)

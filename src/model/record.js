@@ -22,13 +22,12 @@ const createRecord = async (recordInfo) => {
     recordtkeys.push(key)
     recordtvalues.push(value)
   }
-  let stringValue = ""
+  let stringValue = ''
   for (let k in recordtkeys) {
-    stringValue += "?"
+    stringValue += '?'
     if (parseInt(k) !== recordtkeys.length - 1) {
-       stringValue +=","
+      stringValue += ','
     }
-   
   }
   let sql =
    `INSERT INTO yp_order_record(${recordtkeys})
