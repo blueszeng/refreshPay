@@ -65,79 +65,79 @@ const run = async () => {
                   }
                   await record.createRecord(data)
                 }
-              } else {
-                let superior = await agent.getAgentAccountsInfoById(account.referrer)
-                let upSuperior = await agent.getAgentAccountsInfoById(superior.referrer)
-              // 更新自己本身
-                if (!rebate) {
-                  let data = {
-                    manner: 3,
-                    benefactor: 0,
+              }
+            } else {
+              let superior = await agent.getAgentAccountsInfoById(account.referrer)
+              let upSuperior = await agent.getAgentAccountsInfoById(superior.referrer)
+            // 更新自己本身
+              if (!rebate) {
+                let data = {
+                  manner: 3,
+                  benefactor: 0,
+                  recipient: account.accounts,
+                  superior: superior.accounts,
+                  up_id: upSuperior ? upSuperior.accounts : 'NULL',
+                  gems: _order.order_gems,
+                  properties: 0,
+                  sort: 3,
+                  accept_frone: account.gems,
+                  accept_queen: account.gems + _order.order_gems
+                }
+                console.log('data', data)
+                await cards.createCard(data)
+              // 存在一级代理
+              // console.log(superior, superior.agencylv === 1)
+                if (superior && superior.agencylv === 1) {
+                  let data2 = {
+                    benefactor: 3,
                     recipient: account.accounts,
-                    superior: superior.accounts,
-                    up_id: upSuperior ? upSuperior.accounts : 'NULL',
                     gems: _order.order_gems,
-                    properties: 0,
-                    sort: 3,
-                    accept_frone: account.gems,
-                    accept_queen: account.gems + _order.order_gems
-                  }
-                  console.log('data', data)
-                  await cards.createCard(data)
-                // 存在一级代理
-                // console.log(superior, superior.agencylv === 1)
-                  if (superior && superior.agencylv === 1) {
-                    let data2 = {
-                      benefactor: 3,
-                      recipient: account.accounts,
-                      gems: _order.order_gems,
-                      superior_id: superior.accounts,
-                      order_no: _order.order_no,
-                      accumulative: (() => {
-                        let a = _order.order_gems + superior.surplus
-                        let b = superior.limits
-                        return Math.floor(a / b) * superior.rebate
-                      })()
-                    }
-                    await rebates.createRebate(data2)
-                  // 存在多级代理
-                  } else if (superior && superior.agencylv >= 2) {
-                    let data3 = {
-                      benefactor: 3,
-                      recipient: account.accounts,
-                      gems: _order.order_gems,
-                      accumulative: (() => {
-                        let a = _order.order_gems + superior.surplus
-                        let b = superior.limits
-                        return Math.floor(a / b) * superior.rebate
-                      })(),
-                      superior: (() => {
-                        let a = _order.order_gems + upSuperior.surplus
-                        let b = upSuperior.limits
-                        return Math.floor(a / b) * upSuperior.up_rebate
-                      })(),
-                      superior_id: superior.accounts,
-                      up_id: upSuperior.accounts,
-                      order_no: _order.order_no
-                    }
-                    await rebates.createRebate(data3)
-                  }
-                }
-              // 更新钻石
-                let orderGems = account.gems + _order.order_gems
-                await agent.updateAgentGems(orderGems, _order.oper_account)
-                let cord = await record.getRecordInfoByOrderNo(_order.order_no)
-                if (!cord) {
-                  let data = {
+                    superior_id: superior.accounts,
                     order_no: _order.order_no,
-                    state: 1,
-                    gateway_no: _order.sd51no,
-                    fill_money: _order.ordermoney,
-                    sign: _order.sign,
-                    order_gems: orderGems
+                    accumulative: (() => {
+                      let a = _order.order_gems + superior.surplus
+                      let b = superior.limits
+                      return Math.floor(a / b) * superior.rebate
+                    })()
                   }
-                  await record.createRecord(data)
+                  await rebates.createRebate(data2)
+                // 存在多级代理
+                } else if (superior && superior.agencylv >= 2) {
+                  let data3 = {
+                    benefactor: 3,
+                    recipient: account.accounts,
+                    gems: _order.order_gems,
+                    accumulative: (() => {
+                      let a = _order.order_gems + superior.surplus
+                      let b = superior.limits
+                      return Math.floor(a / b) * superior.rebate
+                    })(),
+                    superior: (() => {
+                      let a = _order.order_gems + upSuperior.surplus
+                      let b = upSuperior.limits
+                      return Math.floor(a / b) * upSuperior.up_rebate
+                    })(),
+                    superior_id: superior.accounts,
+                    up_id: upSuperior.accounts,
+                    order_no: _order.order_no
+                  }
+                  await rebates.createRebate(data3)
                 }
+              }
+            // 更新钻石
+              let orderGems = account.gems + _order.order_gems
+              await agent.updateAgentGems(orderGems, _order.oper_account)
+              let cord = await record.getRecordInfoByOrderNo(_order.order_no)
+              if (!cord) {
+                let data = {
+                  order_no: _order.order_no,
+                  state: 1,
+                  gateway_no: _order.sd51no,
+                  fill_money: _order.ordermoney,
+                  sign: _order.sign,
+                  order_gems: orderGems
+                }
+                await record.createRecord(data)
               }
             }
           }
