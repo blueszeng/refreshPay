@@ -1,5 +1,4 @@
 import db from '../config/database'
-let {entries} = Object
 const getRebateInfoByOrderNo = async (orderNo) => {
   let rebateInfo = null
   let sql =
@@ -16,11 +15,10 @@ const getRebateInfoByOrderNo = async (orderNo) => {
 }
 
 const createRebate = async (rebateInfo) => {
-  var rebatetkeys = []
-  var rebatetvalues = []
-  for (let [key, value] of entries(rebateInfo)) {
-    rebatetkeys.push(key)
-    rebatetvalues.push(value)
+  let rebatetkeys = Object.keys(rebateInfo)
+  let rebatetvalues = []
+  for (let key in rebatetkeys) {
+    rebatetvalues.push(rebateInfo[rebatetkeys[key]])
   }
   let sql =
    `INSERT INTO t_rebate(${rebatetkeys})

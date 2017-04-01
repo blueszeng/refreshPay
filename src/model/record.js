@@ -1,5 +1,4 @@
 import db from '../config/database'
-let {entries} = Object
 const getRecordInfoByOrderNo = async (orderNo) => {
   let recordInfo = null
   let sql =
@@ -16,11 +15,10 @@ const getRecordInfoByOrderNo = async (orderNo) => {
 }
 
 const createRecord = async (recordInfo) => {
-  var recordtkeys = []
-  var recordtvalues = []
-  for (let [key, value] of entries(recordInfo)) {
-    recordtkeys.push(key)
-    recordtvalues.push(value)
+  let recordtkeys = Object.keys(recordInfo)
+  let recordtvalues = []
+  for (let key in recordtkeys) {
+    recordtvalues.push(recordInfo[recordtkeys[key]])
   }
   let stringValue = ''
   for (let k in recordtkeys) {
