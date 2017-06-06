@@ -1,5 +1,5 @@
 import db from '../config/database'
-const getRebateInfoByOrderNo = async (orderNo) => {
+const getRebateStatusByOrderNo = async (orderNo) => {
   let rebateInfo = null
   let sql =
    `SELECT * FROM t_rebate
@@ -11,7 +11,7 @@ const getRebateInfoByOrderNo = async (orderNo) => {
   } catch (err) {
     console.log(`search t_rebate ${err}`)
   }
-  return rebateInfo[0]
+  return rebateInfo.length > 0 ? true : false
 }
 
 const createRebate = async (rebateInfo) => {
@@ -48,7 +48,7 @@ const updateRebateBySdcustomno = async (sdcustomno, distributor, todisbate) => {
 }
 
 export default {
-  getRebateInfoByOrderNo,
+  getRebateStatusByOrderNo,
   createRebate,
   updateRebateBySdcustomno
 }

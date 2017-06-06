@@ -4,8 +4,8 @@ import db from '../config/database'
 import moment from 'moment'
 const getTowDayUnixTime = () => {
   let numberDay = 2
-  let beginTime = moment(moment().dates(), 'DD').subtract(numberDay, 'days').unix()
-  let endTime = moment(moment().dates(), 'DD').add(numberDay, 'days').unix()
+  let beginTime = moment(moment().date(), 'DD').subtract(numberDay, 'days').unix()
+  let endTime = moment(moment().date(), 'DD').add(numberDay, 'days').unix()
   return {
     beginTime,
     endTime

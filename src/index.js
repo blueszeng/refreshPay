@@ -23,6 +23,7 @@ const run = async () => {
       if (_order.order_status === 0) { // 只处理订单状态为0的。
         let postData = `customerid=${_order.customer_id}&sdcustomno=${_order.order_no}&sign=${createSign(_order)}&mark=${mark}`
         let ret = await http.post(url, postData)
+      
         if (ret.ok) {
           let items = await ret.text()
           let parseState = await tools.xmlToJson(items)
@@ -33,8 +34,9 @@ const run = async () => {
           if (parseState.ordermoney) {
             _order.ordermoney = parseState.ordermoney * 100
           }
+            console.log('isok==>', parseState)
           if (state === 1) {
-            await order.updateOrderStatus(state, _order.order_no) // 更新订单状态
+            // await order.updateOrderStatus(state, _order.order_no) // 更新订单状态
             let account = await agent.getAgentAccountsInfoById(_order.oper_account)
             let cate = []
             let count = 0;
@@ -43,7 +45,9 @@ const run = async () => {
             let quota;
             let up_superior;
             let up_quota;
-            util.getBate()(cate, account['referrer'], count)
+            let findBaseBate = util.getBate()
+            await findBaseBate(cate, account['referrer'], count)
+            console.log("value===>", cate, account['referrer'], count)
             if (count >= 3) {
               let highest = await agent.getAgentAccountsInfoById(cate[0]['accounts'])
               let rtConfig = await rebateConfig.getRebateConfig(cate[0]['accounts'])
@@ -51,90 +55,91 @@ const run = async () => {
             }
             if (count >= 1) {
               superior = await agent.getAgentAccountsInfoById(account['referrer'])[0]
-              quota = await rebateConfig.getRebateConfig(superior['accounts'],$superior['rechargetotal'],
+              quota = await rebateConfig.getRebateConfig(superior['accounts'], superior['rechargetotal'],
                 $superior['rechargetotal'])[0]
             }
             if (count >= 2) {
               up_superior = await agent.getAgentAccountsInfoById(superior['referrer'])[0]
-              quota = await rebateConfig.getRebateConfig(up_superior['accounts'],$up_superior['rechargetotal'],
-                $up_superior['rechargetotal'])[0]
+              quota = await rebateConfig.getRebateConfig(up_superior['accounts'], $up_superior['rechargetotal'],
+                up_superior['rechargetotal'])[0]
             }
-            let rebate = await rereferrerbates.getRebateInfoByOrderNo(_order.order_no)
+            let rebate = await rebates.getRebateStatusByOrderNo(_order.order_no)
+            console.log("zzzzzzzzzzzzzzzzzzzzzz===>", rebate)
 
             if (!rebate) {
-          
-                   let date = {}
-                   date['gems'] = _order.order_gems;
 
-                   date['sort'] = 3;
+              let date = {}
+              date['gems'] = _order.order_gems;
 
-                   date['benefactor'] = 0;
+              date['sort'] = 3;
 
-                   date['manner'] = 3;
+              date['benefactor'] = 0;
 
-                   date['accept_frone'] = _order.order_gems;
+              date['manner'] = 3;
 
-                   date['accept_queen'] = account.gems + _order.order_gems;
+              date['accept_frone'] = _order.order_gems;
 
-                   if ($count>=1) {
+              date['accept_queen'] = account.gems + _order.order_gems;
 
-                       date['recipient'] = superior['accounts'];
-                   }
-                   if ($count>=2) {
+              if (count >= 1) {
 
-                       date['up_id'] = up_superior['accounts'];
-                   }
-                   await cards.createCard(date)
+                date['recipient'] = superior['accounts'];
+              }
+              if (count >= 2) {
 
-                if (count==1) {
+                date['up_id'] = up_superior['accounts'];
+              }
+              await cards.createCard(date)
 
-                  let date2 = {}
-                  date2['benefactor']=3;  
+              if (count == 1) {
 
-                  date2['recipient']=account['accounts']; 
+                let date2 = {}
+                date2['benefactor'] = 3;
 
-                  date2['gems']=_order.order_gems;
+                date2['recipient'] = account['accounts'];
 
-                  date2['superior_id']=superior['accounts'];
+                date2['gems'] = _order.order_gems;
 
-                  date2['order_no']=_order.order_no; 
-                  
-                  date2['accumulative']=floor(_order.order_gems*quota['first_upper_rebate']);
+                date2['superior_id'] = superior['accounts'];
 
-                   await rebates.createRebate(data2)
-                   
-                }
+                date2['order_no'] = _order.order_no;
 
-                if (count>=2) {
+                date2['accumulative'] = floor(_order.order_gems * quota['first_upper_rebate']);
 
-                  let date3 = {}
+                await rebates.createRebate(data2)
 
-                  date3['benefactor']=3
+              }
 
-                  date3['recipient']=account['accounts']
+              if (count >= 2) {
 
-                  date3['gems']=_order.order_gems
+                let date3 = {}
 
-                  date3['accumulative']=floor(_order.order_gems*quota['first_upper_rebate'])
+                date3['benefactor'] = 3
 
-                  date3['superior']=floor(_order.order_gems*up_quota['second_upper_rebate'])
+                date3['recipient'] = account['accounts']
 
-                  date3['superior_id']=superior['accounts']
+                date3['gems'] = _order.order_gems
 
-                  date3['up_id']=up_superior['accounts']
+                date3['accumulative'] = floor(_order.order_gems * quota['first_upper_rebate'])
 
-                  date3['order_no']=_order.order_no
+                date3['superior'] = floor(_order.order_gems * up_quota['second_upper_rebate'])
 
-                  await rebates.createRebate(data3)
-           
-                }
-                if (count >= 3 && highest['agencylv'] == 0) {
-                  await rebates.updateRebateBySdcustomno(_order.order_no,cate[0]['accounts'],dis)
-                }
-             }
-                // 更新钻石
-              let orderGems = account.gems + _order.order_gems
-              await agent.updateAgentGems(orderGems, _order.oper_account)
+                date3['superior_id'] = superior['accounts']
+
+                date3['up_id'] = up_superior['accounts']
+
+                date3['order_no'] = _order.order_no
+
+                await rebates.createRebate(data3)
+
+              }
+              if (count >= 3 && highest['agencylv'] == 0) {
+                await rebates.updateRebateBySdcustomno(_order.order_no, cate[0]['accounts'], dis)
+              }
+            }
+            // 更新钻石
+            let orderGems = account.gems + _order.order_gems
+            await agent.updateAgentGems(orderGems, _order.oper_account)
           }
         }
       }
