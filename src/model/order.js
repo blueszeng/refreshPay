@@ -1,5 +1,5 @@
-import cache from '../cache'
-const orderKey = 'order_data'
+// import cache from '../cache'
+// const orderKey = 'order_data'
 import db from '../config/database'
 import moment from 'moment'
 const getTowDayUnixTime = () => {
@@ -13,8 +13,8 @@ const getTowDayUnixTime = () => {
 }
 const getAllOrderInfo = async () => {
   let orderData = null
-  await cache.getCache(orderKey)
-  if (orderData === null) {
+  // await cache.getCache(orderKey)
+  // if (orderData === null) {
     let times = getTowDayUnixTime()
     let sql =
      `SELECT * FROM yp_apply_order
@@ -28,8 +28,8 @@ const getAllOrderInfo = async () => {
     } catch (err) {
       console.log(`search yp_apply_order ${err}`)
     }
-    await cache.setCache(orderKey, orderData)
-  }
+    // await cache.setCache(orderKey, orderData)
+  // }
   return orderData
 }
 const updateOrderStatus = async (status, sdcustomno) => {
@@ -40,7 +40,7 @@ const updateOrderStatus = async (status, sdcustomno) => {
   `
   try {
     await db.query(sql)
-    await cache.cleanCache(orderKey)
+    // await cache.cleanCache(orderKey)
     console.log('update yp_apply_order success')
   } catch (err) {
     console.log(`search yp_apply_order ${err}`)

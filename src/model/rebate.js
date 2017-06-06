@@ -32,7 +32,23 @@ const createRebate = async (rebateInfo) => {
   }
 }
 
+
+const updateRebateBySdcustomno = async (sdcustomno, distributor, todisbate) => {
+   let sql =
+   `UPDATE t_rebate
+    SET distributor=${distributor}, todisbate = ${todisbate} 
+    WHERE order_no = ${sdcustomno}`
+  try {
+    console.log(sql)
+    await db.query(sql)
+    console.log('update t_rebate success')
+  } catch (err) {
+    console.log(`update t_rebate ${err}`)
+  }
+}
+
 export default {
   getRebateInfoByOrderNo,
-  createRebate
+  createRebate,
+  updateRebateBySdcustomno
 }

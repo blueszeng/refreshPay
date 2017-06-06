@@ -3,9 +3,11 @@ import agent from './model/agent'
 import cards from './model/addCards'
 import rebates from './model/rebate'
 import record from './model/record'
+import rebateConfig from './model/rebateConfig'
 import crypto from './utils/crypto'
 import http from './utils/http'
 import tools from './utils/tools'
+import util from './utils/util'
 const url = 'http://www.zhifuka.net/gateway/zx_orderquery.asp'
 const mark = 'diamondforplayers'
 const key = '244ca72c106b8eef6c27f2e97bfd93ee'
@@ -34,117 +36,111 @@ const run = async () => {
           if (state === 1) {
             await order.updateOrderStatus(state, _order.order_no) // 更新订单状态
             let account = await agent.getAgentAccountsInfoById(_order.oper_account)
-            let rebate = await rebates.getRebateInfoByOrderNo(_order.order_no)
-            console.log('account', account)
-            if (account && account.agencylv === 0) {
-              // 没有子代理更新本身数据
-              if (!rebate) {
-                let date = {
-                  manner: 3,
-                  benefactor: 0,
-                  recipient: account.accounts,
-                  gems: _order.order_gems,
-                  properties: 0,
-                  sort: 3,
-                  accept_frone: _order.order_gems,
-                  accept_queen: account.gems + _order.order_gems
+            let cate = []
+            let count = 0;
+            let dis;
+            let superior;
+            let quota;
+            let up_superior;
+            let up_quota;
+            util.getBate()(cate, account['referrer'], count)
+            if (count >= 3) {
+              let highest = await agent.getAgentAccountsInfoById(cate[0]['accounts'])
+              let rtConfig = await rebateConfig.getRebateConfig(cate[0]['accounts'])
+              dis = Math.floor(_order.order_gems * highest[0]['disbate'])
+            }
+            if (count >= 1) {
+              superior = await agent.getAgentAccountsInfoById(account['referrer'])[0]
+              quota = await rebateConfig.getRebateConfig(superior['accounts'],$superior['rechargetotal'],
+                $superior['rechargetotal'])[0]
+            }
+            if (count >= 2) {
+              up_superior = await agent.getAgentAccountsInfoById(superior['referrer'])[0]
+              quota = await rebateConfig.getRebateConfig(up_superior['accounts'],$up_superior['rechargetotal'],
+                $up_superior['rechargetotal'])[0]
+            }
+            let rebate = await rereferrerbates.getRebateInfoByOrderNo(_order.order_no)
+
+            if (!rebate) {
+          
+                   let date = {}
+                   date['gems'] = _order.order_gems;
+
+                   date['sort'] = 3;
+
+                   date['benefactor'] = 0;
+
+                   date['manner'] = 3;
+
+                   date['accept_frone'] = _order.order_gems;
+
+                   date['accept_queen'] = account.gems + _order.order_gems;
+
+                   if ($count>=1) {
+
+                       date['recipient'] = superior['accounts'];
+                   }
+                   if ($count>=2) {
+
+                       date['up_id'] = up_superior['accounts'];
+                   }
+                   await cards.createCard(date)
+
+                if (count==1) {
+
+                  let date2 = {}
+                  date2['benefactor']=3;  
+
+                  date2['recipient']=account['accounts']; 
+
+                  date2['gems']=_order.order_gems;
+
+                  date2['superior_id']=superior['accounts'];
+
+                  date2['order_no']=_order.order_no; 
+                  
+                  date2['accumulative']=floor(_order.order_gems*quota['first_upper_rebate']);
+
+                   await rebates.createRebate(data2)
+                   
                 }
-                await cards.createCard(date)
-                let cord = await record.getRecordInfoByOrderNo(_order.order_no)
-                 // 更新钻石
-                let orderGems = account.gems + _order.order_gems
-                await agent.updateAgentGems(orderGems, _order.oper_account)
-                if (!cord) {
-                  let data = {
-                    order_no: _order.order_no,
-                    state: 1,
-                    gateway_no: _order.sd51no,
-                    fill_money: _order.ordermoney,
-                    sign: _order.sign,
-                    order_gems: orderGems
-                  }
-                  await record.createRecord(data)
-                }
-              }
-            } else {
-              let superior = await agent.getAgentAccountsInfoById(account.referrer)
-              let upSuperior = await agent.getAgentAccountsInfoById(superior.referrer)
-            // 更新自己本身
-              if (!rebate) {
-                let data = {
-                  manner: 3,
-                  benefactor: 0,
-                  recipient: account.accounts,
-                  superior: superior.accounts,
-                  up_id: upSuperior ? upSuperior.accounts : 'NULL',
-                  gems: _order.order_gems,
-                  properties: 0,
-                  sort: 3,
-                  accept_frone: account.gems,
-                  accept_queen: account.gems + _order.order_gems
-                }
-                console.log('data', data)
-                await cards.createCard(data)
-              // 存在一级代理
-              // console.log(superior, superior.agencylv === 1)
-                if (superior && superior.agencylv === 1) {
-                  let data2 = {
-                    benefactor: 3,
-                    recipient: account.accounts,
-                    gems: _order.order_gems,
-                    superior_id: superior.accounts,
-                    order_no: _order.order_no,
-                    accumulative: (() => {
-                      let a = _order.order_gems + superior.surplus
-                      let b = superior.limits
-                      return Math.floor(a / b) * superior.rebate
-                    })()
-                  }
-                  await rebates.createRebate(data2)
-                // 存在多级代理
-                } else if (superior && superior.agencylv >= 2) {
-                  let data3 = {
-                    benefactor: 3,
-                    recipient: account.accounts,
-                    gems: _order.order_gems,
-                    accumulative: (() => {
-                      let a = _order.order_gems + superior.surplus
-                      let b = superior.limits
-                      return Math.floor(a / b) * superior.rebate
-                    })(),
-                    superior: (() => {
-                      let a = _order.order_gems + upSuperior.surplus
-                      let b = upSuperior.limits
-                      return Math.floor(a / b) * upSuperior.up_rebate
-                    })(),
-                    superior_id: superior.accounts,
-                    up_id: upSuperior.accounts,
-                    order_no: _order.order_no
-                  }
+
+                if (count>=2) {
+
+                  let date3 = {}
+
+                  date3['benefactor']=3
+
+                  date3['recipient']=account['accounts']
+
+                  date3['gems']=_order.order_gems
+
+                  date3['accumulative']=floor(_order.order_gems*quota['first_upper_rebate'])
+
+                  date3['superior']=floor(_order.order_gems*up_quota['second_upper_rebate'])
+
+                  date3['superior_id']=superior['accounts']
+
+                  date3['up_id']=up_superior['accounts']
+
+                  date3['order_no']=_order.order_no
+
                   await rebates.createRebate(data3)
+           
                 }
-              }
-            // 更新钻石
+                if (count >= 3 && highest['agencylv'] == 0) {
+                  await rebates.updateRebateBySdcustomno(_order.order_no,cate[0]['accounts'],dis)
+                }
+             }
+                // 更新钻石
               let orderGems = account.gems + _order.order_gems
               await agent.updateAgentGems(orderGems, _order.oper_account)
-              let cord = await record.getRecordInfoByOrderNo(_order.order_no)
-              if (!cord) {
-                let data = {
-                  order_no: _order.order_no,
-                  state: 1,
-                  gateway_no: _order.sd51no,
-                  fill_money: _order.ordermoney,
-                  sign: _order.sign,
-                  order_gems: orderGems
-                }
-                await record.createRecord(data)
-              }
-            }
           }
         }
       }
     }
   }
 }
-// run()
-setInterval(run, 60000)
+console.log("run===>")
+run();
+// setInterval(run, 5000)
