@@ -16,9 +16,13 @@ function format(args, argv) {
 	return args;
 }
 const getBate = (state = false, sql) => {  //下级找上级找到总代理为止
-	return async (cate, a = 0, count) => {
+	let cate = []
+	let count = 0
+	var callBate =  async (a = 0) => {
+
+		console.log("cccccc==========>",count, cate)
 		let sql
-		if(state == false){
+		if(state == false) {
 		    sql = `select * from t_agent where accounts=${a}`
 		} else {
 			let value = []
@@ -29,18 +33,24 @@ const getBate = (state = false, sql) => {  //下级找上级找到总代理为�
 		try {
 	   		console.log(sql)
 	    	let bateInfo = await db.query(sql)
-			// console.log("cccccc==>", bateInfo)
+	
 	    	if (bateInfo.length > 0) {
 	    		if (bateInfo[0]['agencylv'] !== 100) {
 	    			count ++
 	    			cate = bateInfo
-	    			callee(cate, bateInfo[0]['referrer'], count)
+					console.log("cccccc==========>2222",count, cate)
+	    			await callBate(bateInfo[0]['referrer'])
 	    		}
 	    	}
 	  	} catch (err) {
 	    	console.log(`search t_agent ${err}`)
 	 	}
+		return  {
+			cate,
+			count
+		}
 	}
+	return callBate
 }
 
 export default {

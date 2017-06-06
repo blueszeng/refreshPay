@@ -5,9 +5,9 @@ module.exports = {
     expire: 60 * 10
   },
   mysql: {
-    host: 'localhost',
+    host: '192.168.0.103',
     user: 'root',
-    password: '123456',
+    password: '',
     database: 'admin'
   }
 }
