@@ -36,7 +36,7 @@ const run = async () => {
           }
           // console.log('isok==>', parseState)
           if (state === 1) {
-            // await order.updateOrderStatus(state, _order.order_no) // 更新订单状态
+            await order.updateOrderStatus(state, _order.order_no) // 更新订单状态
             let account = await agent.getAgentAccountsInfoById(_order.oper_account)
             let dis;
             let superior;
