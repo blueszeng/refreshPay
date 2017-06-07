@@ -7,7 +7,7 @@ const createCard = async (accountInfo) => {
     accountvalues.push(accountInfo[accountkeys[key]])
   }
   let sql =
-   `INSERT INTO t_agent_add_cards_to_agent(${accountkeys})
+    `INSERT INTO t_agent_add_cards_to_agent(${accountkeys})
     VALUES(${accountvalues})`
   try {
     console.log(sql)

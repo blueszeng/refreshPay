@@ -7,7 +7,8 @@ const post = async (url, postData) => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: postData }
+      body: postData
+    }
     res = await fetch(url, data)
   } catch (err) {
     console.log(err)

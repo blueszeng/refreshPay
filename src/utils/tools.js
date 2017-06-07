@@ -1,4 +1,4 @@
-import {to_json} from 'xmljson'
+import { to_json } from 'xmljson'
 const xmlToJson = (items) => {
   return new Promise((resolve, reject) => {
     let values = {}

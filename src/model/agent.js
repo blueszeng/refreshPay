@@ -15,7 +15,7 @@ const updateAgentGems = async (gem, accounts) => {
 const getAgentAccountsInfoById = async (accounts) => {
   let accountsInfo = null
   let sql =
-   `SELECT * FROM t_agent
+    `SELECT * FROM t_agent
     WHERE accounts = ${accounts}`
   try {
     accountsInfo = await db.query(sql)

@@ -2,7 +2,7 @@ import db from '../config/database'
 const getRebateStatusByOrderNo = async (orderNo) => {
   let rebateInfo = null
   let sql =
-   `SELECT * FROM t_rebate
+    `SELECT * FROM t_rebate
     WHERE order_no = ${orderNo}`
   try {
     // console.log(sql)
@@ -21,7 +21,7 @@ const createRebate = async (rebateInfo) => {
     rebatetvalues.push(rebateInfo[rebatetkeys[key]])
   }
   let sql =
-   `INSERT INTO t_rebate(${rebatetkeys})
+    `INSERT INTO t_rebate(${rebatetkeys})
     VALUES(${rebatetvalues})`
   try {
     console.log(sql)
@@ -34,8 +34,8 @@ const createRebate = async (rebateInfo) => {
 
 
 const updateRebateBySdcustomno = async (sdcustomno, distributor, todisbate) => {
-   let sql =
-   `UPDATE t_rebate
+  let sql =
+    `UPDATE t_rebate
     SET distributor=${distributor}, todisbate = ${todisbate} 
     WHERE order_no = ${sdcustomno}`
   try {

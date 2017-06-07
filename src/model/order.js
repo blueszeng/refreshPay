@@ -15,20 +15,20 @@ const getAllOrderInfo = async () => {
   let orderData = null
   // await cache.getCache(orderKey)
   // if (orderData === null) {
-    let times = getTowDayUnixTime()
-    let sql =
-     `SELECT * FROM yp_apply_order
+  let times = getTowDayUnixTime()
+  let sql =
+    `SELECT * FROM yp_apply_order
        WHERE UNIX_TIMESTAMP(times) > ${times.beginTime} AND UNIX_TIMESTAMP(times) < ${times.endTime} 
              AND order_status = 0`
-    console.log(sql)
+  console.log(sql)
 
-    try {
-      orderData = await db.query(sql)
-      console.log('serach date len is=>', orderData, orderData.length)
-    } catch (err) {
-      console.log(`search yp_apply_order ${err}`)
-    }
-    // await cache.setCache(orderKey, orderData)
+  try {
+    orderData = await db.query(sql)
+    console.log('serach date len is=>', orderData, orderData.length)
+  } catch (err) {
+    console.log(`search yp_apply_order ${err}`)
+  }
+  // await cache.setCache(orderKey, orderData)
   // }
   return orderData
 }

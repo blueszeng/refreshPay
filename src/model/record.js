@@ -2,7 +2,7 @@ import db from '../config/database'
 const getRecordInfoByOrderNo = async (orderNo) => {
   let recordInfo = null
   let sql =
-   `SELECT * FROM yp_order_record
+    `SELECT * FROM yp_order_record
     WHERE order_no = ${orderNo}`
   try {
     console.log(sql)
@@ -28,7 +28,7 @@ const createRecord = async (recordInfo) => {
     }
   }
   let sql =
-   `INSERT INTO yp_order_record(${recordtkeys})
+    `INSERT INTO yp_order_record(${recordtkeys})
     VALUES(${stringValue})`
   try {
     console.log(sql)
