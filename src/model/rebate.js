@@ -5,9 +5,9 @@ const getRebateStatusByOrderNo = async (orderNo) => {
    `SELECT * FROM t_rebate
     WHERE order_no = ${orderNo}`
   try {
-    console.log(sql)
+    // console.log(sql)
     rebateInfo = await db.query(sql)
-    console.log(rebateInfo)
+    // console.log(rebateInfo)
   } catch (err) {
     console.log(`search t_rebate ${err}`)
   }

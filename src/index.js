@@ -34,7 +34,7 @@ const run = async () => {
           if (parseState.ordermoney) {
             _order.ordermoney = parseState.ordermoney * 100
           }
-          console.log('isok==>', parseState)
+          // console.log('isok==>', parseState)
           if (state === 1) {
             // await order.updateOrderStatus(state, _order.order_no) // 更新订单状态
             let account = await agent.getAgentAccountsInfoById(_order.oper_account)
@@ -43,20 +43,21 @@ const run = async () => {
             let quota;
             let up_superior;
             let up_quota;
+            let highest;
             let findBaseBate = util.getBate()
             let { cate, count } = await findBaseBate(account['referrer'])
-            console.log("value===>", cate, count)
+            // console.log("value===>", cate, count)
             if (count >= 3) {
-              let highest = await agent.getAgentAccountsInfoById(cate[0]['accounts'])
+              highest = await agent.getAgentAccountsInfoById(cate[0]['accounts'])
               let rtConfig = await rebateConfig.getRebateConfig(cate[0]['accounts'])
-              dis = Math.floor(_order.order_gems * highest[0]['disbate'])
+              dis = Math.floor(_order.order_gems * rtConfig['disbate'])
+              console.log("dis=============================>", dis)
             }
             if (count >= 1) {
               superior = await agent.getAgentAccountsInfoById(account['referrer'])
               // console.log("gggggggggggggggggggggggggg", superior)
               quota = await rebateConfig.getRebateConfig(superior['accounts'], superior['rechargetotal'],
                 superior['rechargetotal'])
-              console.log("sdfsdfsdfsdf", quota)
             }
             if (count >= 2) {
               up_superior = await agent.getAgentAccountsInfoById(superior['referrer'])
@@ -65,7 +66,7 @@ const run = async () => {
                 up_superior['rechargetotal'])
             }
             let rebate = await rebates.getRebateStatusByOrderNo(_order.order_no)
-            console.log("zzzzzzzzzzzzzzzzzzzzz", rebate, _order.order_no)
+            console.log("rebate====================================================>", rebate, _order.order_no)
             if (!rebate) {
               let data = {}
               data['gems'] = _order.order_gems;
@@ -130,7 +131,9 @@ const run = async () => {
                 await rebates.createRebate(data3)
 
               }
+              console.log("zzzzzzzzzzzzzzzzzzzz==============================>",  highest['agencylv'])
               if (count >= 3 && highest['agencylv'] == 0) {
+              
                 await rebates.updateRebateBySdcustomno(_order.order_no, cate[0]['accounts'], dis)
               }
               // 更新钻石

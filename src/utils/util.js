@@ -19,9 +19,6 @@ const getBate = (state = false, sql) => {  //下级找上级找到总代理为�
 	let cate = []
 	let count = 0
 	var callBate =  async (a = 0) => {
-
-		console.log("cccccc==========>",count, cate)
-		let sql
 		if(state == false) {
 		    sql = `select * from t_agent where accounts=${a}`
 		} else {
@@ -31,14 +28,13 @@ const getBate = (state = false, sql) => {  //下级找上级找到总代理为�
 		}
 		// console.log("ggggg==>", sql)
 		try {
-	   		console.log(sql)
+	   		// console.log(sql)
 	    	let bateInfo = await db.query(sql)
 	
 	    	if (bateInfo.length > 0) {
 	    		if (bateInfo[0]['agencylv'] !== 100) {
 	    			count ++
 	    			cate = bateInfo
-					console.log("cccccc==========>2222",count, cate)
 	    			await callBate(bateInfo[0]['referrer'])
 	    		}
 	    	}

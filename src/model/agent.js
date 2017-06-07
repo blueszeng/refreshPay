@@ -19,7 +19,7 @@ const getAgentAccountsInfoById = async (accounts) => {
     WHERE accounts = ${accounts}`
   try {
     accountsInfo = await db.query(sql)
-    console.log("hahahah", accountsInfo)
+    // console.log("hahahah", accountsInfo)
   } catch (err) {
     console.log(`search yp_apply_order ${err}`)
   }
