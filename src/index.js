@@ -55,18 +55,16 @@ const run = async () => {
             }
             if (count >= 1) {
               superior = await agent.getAgentAccountsInfoById(account['referrer'])
-              // console.log("gggggggggggggggggggggggggg", superior)
               quota = await rebateConfig.getRebateConfig(superior['accounts'], superior['rechargetotal'],
                 superior['rechargetotal'])
             }
             if (count >= 2) {
               up_superior = await agent.getAgentAccountsInfoById(superior['referrer'])
-              // console.log("gggggggggggggggggggggggggg", up_superior)
               up_quota = await rebateConfig.getRebateConfig(up_superior['accounts'], up_superior['rechargetotal'],
                 up_superior['rechargetotal'])
             }
             let rebate = await rebates.getRebateStatusByOrderNo(_order.order_no)
-            console.log("rebate====================================================>", rebate, _order.order_no)
+            // console.log("rebate====================================================>", rebate, _order.order_no)
             if (!rebate) {
               let data = {}
               data['gems'] = _order.order_gems;
@@ -133,7 +131,6 @@ const run = async () => {
               }
               console.log("zzzzzzzzzzzzzzzzzzzz==============================>",  highest['agencylv'])
               if (count >= 3 && highest['agencylv'] == 0) {
-              
                 await rebates.updateRebateBySdcustomno(_order.order_no, cate[0]['accounts'], dis)
               }
               // 更新钻石

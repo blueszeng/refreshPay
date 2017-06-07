@@ -24,7 +24,7 @@ const getAllOrderInfo = async () => {
 
     try {
       orderData = await db.query(sql)
-      console.log('serach date len is=>', orderData.length)
+      console.log('serach date len is=>', orderData, orderData.length)
     } catch (err) {
       console.log(`search yp_apply_order ${err}`)
     }
